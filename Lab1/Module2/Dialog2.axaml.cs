@@ -14,6 +14,6 @@ public partial class Dialog2 : Window
             dialog3.Show();
             Close();
         };
-        CancelButton.Click += (_, __) => { Close(); };
+        CancelButton.Click += (_, __) => Close();
     }
 }

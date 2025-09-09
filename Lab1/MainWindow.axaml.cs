@@ -14,6 +14,7 @@ public partial class MainWindow : Window
     private async void Work1_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         int selectedNumber = await Work1.OnClick(this);
+        if (selectedNumber == -1) return;
         SelectedNumberTextBlock.Text = $"Вибране число: {selectedNumber}";
     }
 

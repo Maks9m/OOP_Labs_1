@@ -8,17 +8,15 @@ public partial class Dialog3 : Window
     {
         InitializeComponent();
 
-        PreviousButton.Click += (_, __) =>
-        {
-            var dialog2 = new Dialog2();
-            dialog2.Show();
-            Close();
-        };
-        CancelButton.Click += (_, __) =>
-        {
-            var dialog2 = new Dialog2();
-            dialog2.Show();
-            Close();
-        };
+        OkButton.Click += (_, __) => Close();
+        PreviousButton.Click += (_, __) => ShowDialog2();
+        CancelButton.Click += (_, __) => ShowDialog2();
+    }
+
+    private void ShowDialog2()
+    {
+        var dialog2 = new Dialog2();
+        dialog2.Show();
+        Close();
     }
 }

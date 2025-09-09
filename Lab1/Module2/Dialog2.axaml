@@ -4,7 +4,7 @@
         Title="Діалог 1" Width="300" Height="150"
         RequestedThemeVariant="Light">
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Spacing="10" Orientation="Horizontal">
-        <Button Name="NextButton" Content="Вперед"/>
         <Button Name="CancelButton" Content="Відміна"/>
+        <Button Name="NextButton" Content="Вперед"/>
     </StackPanel>
 </Window>

@@ -13,6 +13,6 @@ public async static Task<int> OnClick(Window parent)
         {
             return dialog.SelectedValue;
         }
-    return 0;
+    return -1;
 }
 }

@@ -4,8 +4,8 @@
         Title="Діалог 2" Width="300" Height="150"
         RequestedThemeVariant="Light">
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Spacing="10" Orientation="Horizontal">
-        <Button Name="PreviousButton" Content="Назад"/>
-        <Button Content="Так"/>
         <Button Name="CancelButton" Content="Відміна"/>
+        <Button Name="PreviousButton" Content="Назад"/>
+        <Button Name="OkButton" Content="Так"/>
     </StackPanel>
 </Window>
