@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/maksymkramarenko/MyCode/OOP/OOP_Labs_1/Lab1/Lab1/Lab1.csproj": {}
+    "/Users/maksymkramarenko/MyCode/OOP/OOP_Labs_1/Lab1/Lab1.csproj": {}
   },
   "projects": {
-    "/Users/maksymkramarenko/MyCode/OOP/OOP_Labs_1/Lab1/Lab1/Lab1.csproj": {
+    "/Users/maksymkramarenko/MyCode/OOP/OOP_Labs_1/Lab1/Lab1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/maksymkramarenko/MyCode/OOP/OOP_Labs_1/Lab1/Lab1/Lab1.csproj",
+        "projectUniqueName": "/Users/maksymkramarenko/MyCode/OOP/OOP_Labs_1/Lab1/Lab1.csproj",
         "projectName": "Lab1",
-        "projectPath": "/Users/maksymkramarenko/MyCode/OOP/OOP_Labs_1/Lab1/Lab1/Lab1.csproj",
+        "projectPath": "/Users/maksymkramarenko/MyCode/OOP/OOP_Labs_1/Lab1/Lab1.csproj",
         "packagesPath": "/Users/maksymkramarenko/.nuget/packages/",
-        "outputPath": "/Users/maksymkramarenko/MyCode/OOP/OOP_Labs_1/Lab1/Lab1/obj/",
+        "outputPath": "/Users/maksymkramarenko/MyCode/OOP/OOP_Labs_1/Lab1/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/maksymkramarenko/.nuget/NuGet/NuGet.Config"
