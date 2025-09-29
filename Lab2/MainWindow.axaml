@@ -1,0 +1,40 @@
+<Window xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Lab2.Controls"
+    x:Class="Lab2.MainWindow"
+    Title="Lab2" Width="1400" Height="800"
+    RequestedThemeVariant="Light">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Файл" Click="File_Click" />
+            <MenuItem x:Name="ObjectsMenuItem" Header="Обʼєкт">
+                <MenuItem>
+                    <MenuItem.Header>
+                        <RadioButton GroupName="ShapeGroup" Content="Точка" Tag="Point" IsChecked="True" Checked="ShapeRadio_Checked"/>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem>
+                    <MenuItem.Header>
+                        <RadioButton GroupName="ShapeGroup" Content="Лінія" Tag="Line" Checked="ShapeRadio_Checked"/>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem>
+                    <MenuItem.Header>
+                        <RadioButton GroupName="ShapeGroup" Content="Еліпс" Tag="Ellipse" Checked="ShapeRadio_Checked"/>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem>
+                    <MenuItem.Header>
+                        <RadioButton GroupName="ShapeGroup" Content="Прямокутник" Tag="Rectangle" Checked="ShapeRadio_Checked"/>
+                    </MenuItem.Header>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Довідка" Click="Help_Click" />
+        </Menu>
+    <local:DrawingCanvas x:Name="EditorCanvas"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Focusable="True"
+                  Cursor="Cross"/>
+    </DockPanel>
+</Window>
