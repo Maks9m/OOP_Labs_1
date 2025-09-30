@@ -5,7 +5,7 @@ namespace Lab2.Shapes;
 
 public sealed class LineShape : ShapeBase
 {
-    public Pen Pen { get; init; } = new Pen(Brushes.Black, 1);
+    public Pen Pen { get; init; } = new Pen(Brushes.Black, 2);
 
     public LineShape(Point p1, Point p2) : base(p1, p2) { }
 

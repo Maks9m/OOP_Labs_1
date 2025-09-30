@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Lab2.Shapes;
+using Lab2.Editors;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,10 +18,7 @@ public sealed class DrawingCanvas : Control
 
     private readonly List<ShapeBase?> _shapes = new(Capacity);
     private ShapeKind _mode = ShapeKind.Point;
-
-    private bool _isDrawing;
-    private Point _start;
-    private Point _current;
+    private EditorBase _editor = new PointEditor();
 
     public DrawingCanvas()
     {
@@ -30,20 +28,38 @@ public sealed class DrawingCanvas : Control
     public ShapeKind Mode
     {
         get => _mode;
-        set { _mode = value; InvalidateVisual(); }
+        set
+        {
+            _mode = value;
+            _editor = _mode switch
+            {
+                ShapeKind.Point => new PointEditor(),
+                ShapeKind.Line => new LineEditor(),
+                ShapeKind.Rectangle => new RectEditor(),
+                ShapeKind.Ellipse => new EllipseEditor(),
+                _ => new PointEditor(),
+            };
+            _editor.SetCanvas(this);
+            InvalidateVisual();
+        }
     }
 
     public IReadOnlyList<ShapeBase?> Shapes => _shapes;
 
+    public void AddShape(ShapeBase shape)
+    {
+        if (_shapes.Count >= Capacity)
+            _shapes.RemoveAt(0);
+        _shapes.Add(shape);
+    }
+
     protected override Size MeasureOverride(Size availableSize)
     {
-        // Take all available space so the surface is hit-testable
         return availableSize;
     }
 
     protected override Size ArrangeOverride(Size finalSize)
     {
-        // Occupy full assigned size
         return finalSize;
     }
 
@@ -63,50 +79,25 @@ public sealed class DrawingCanvas : Control
     {
         base.OnPointerPressed(e);
         var p = e.GetPosition(this);
-    Focus();
-        _isDrawing = true;
-        _start = _current = p;
-
-        if (_mode == ShapeKind.Point)
-        {
-            AddShape(new PointShape(p));
-            InvalidateVisual();
-            _isDrawing = false;
-        }
+        Focus();
+        _editor.SetCanvas(this);
+        _editor.OnMouseDown(p);
         e.Pointer.Capture(this);
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
-        if (!_isDrawing) return;
-        _current = e.GetPosition(this);
-        InvalidateVisual(); // rubber band
+        var p = e.GetPosition(this);
+        _editor.OnMouseMove(p);
+        InvalidateVisual();
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
-        if (!_isDrawing) return;
-        _isDrawing = false;
-        var end = e.GetPosition(this);
-
-        switch (_mode)
-        {
-            case ShapeKind.Line:
-                AddShape(new LineShape(_start, end));
-                break;
-            case ShapeKind.Rectangle:
-                // Variant 16 (J=16): For rect (J mod 2 = 0) -> by opposite corners; Fill color (J mod 6 = 4) -> Orange
-                AddShape(new RectShape(_start, end) { Fill = Brushes.Orange });
-                break;
-            case ShapeKind.Ellipse:
-                // Variant 16 (J mod 2 = 0) for ellipse -> center-to-corner of bounding rect; Fill per (J mod 6 = 4) -> Orange? But for ellipse rules differ: (J mod 5 = 3 or 4) colored fill, (J mod 6 = 4) -> Orange.
-                var cx = _start.X; var cy = _start.Y;
-                var rect = new Rect(new Point(cx - (end.X - cx), cy - (end.Y - cy)), end).Normalize();
-                AddShape(new EllipseShape(rect.TopLeft, rect.BottomRight) { Fill = Brushes.Orange });
-                break;
-        }
+        var p = e.GetPosition(this);
+        _editor.OnMouseUp(p);
         e.Pointer.Capture(null);
         InvalidateVisual();
     }
@@ -115,40 +106,13 @@ public sealed class DrawingCanvas : Control
     {
         base.Render(context);
 
-        // Subtle background so the drawing area is visible and clearly hit-testable
         var bgRect = new Rect(Bounds.Size);
         context.FillRectangle(Brushes.WhiteSmoke, bgRect);
 
-        // Draw committed shapes
         foreach (var s in _shapes.Where(s => s is not null))
             s!.Render(context);
 
-        // Rubber band preview (Variant 16: solid black line)
-        if (_isDrawing && _mode != ShapeKind.Point)
-        {
-            var pen = new Pen(Brushes.Black, 1);
-            if (_mode == ShapeKind.Line)
-            {
-                context.DrawLine(pen, _start, _current);
-            }
-            else if (_mode == ShapeKind.Rectangle)
-            {
-                var r = new Rect(_start, _current).Normalize();
-                context.DrawRectangle(null, pen, r);
-            }
-            else if (_mode == ShapeKind.Ellipse)
-            {
-                var cx = _start.X; var cy = _start.Y;
-                var r = new Rect(new Point(cx - (_current.X - cx), cy - (_current.Y - cy)), _current).Normalize();
-                context.DrawEllipse(null, pen, r.Center, r.Width/2, r.Height/2);
-            }
-        }
-    }
-
-    private void AddShape(ShapeBase shape)
-    {
-        if (_shapes.Count >= Capacity)
-            _shapes.RemoveAt(0); // drop oldest to maintain capacity
-        _shapes.Add(shape);
+        _editor.SetCanvas(this);
+        _editor.PaintPreview(context);
     }
 }
