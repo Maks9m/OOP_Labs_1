@@ -15,4 +15,16 @@ public sealed class EllipseShape : ShapeBase
         var rect = new Rect(P1, P2).Normalize();
         ctx.DrawEllipse(Fill, Pen, rect.Center, rect.Width/2, rect.Height/2);
     }
+
+    public override ShapeBase CreateInstance(Point startPoint)
+    {
+        return new EllipseShape(startPoint, startPoint) { Fill = null };
+    }
+
+    public override void PaintRubberBand(DrawingContext ctx, Pen pen, Point startPoint, Point currentPoint)
+    {
+        // Варіант 17: еліпс по двом протилежним кутам
+        var ellipseRect = new Rect(startPoint, currentPoint).Normalize();
+        ctx.DrawEllipse(null, pen, ellipseRect.Center, ellipseRect.Width/2, ellipseRect.Height/2);
+    }
 }

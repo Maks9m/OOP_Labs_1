@@ -14,4 +14,14 @@ public sealed class LineShape : ShapeBase
     {
         ctx.DrawLine(Pen, P1, P2);
     }
+
+    public override ShapeBase CreateInstance(Point startPoint)
+    {
+        return new LineShape(startPoint.X, startPoint.Y, startPoint.X, startPoint.Y);
+    }
+
+    public override void PaintRubberBand(DrawingContext ctx, Pen pen, Point startPoint, Point currentPoint)
+    {
+        ctx.DrawLine(pen, startPoint, currentPoint);
+    }
 }

@@ -73,4 +73,52 @@ public sealed class CubeShape : ShapeBase
             line.Render(context);
         }
     }
+
+    public override ShapeBase CreateInstance(Point startPoint)
+    {
+        return new CubeShape(startPoint, startPoint);
+    }
+
+    public override void PaintRubberBand(DrawingContext ctx, Pen pen, Point startPoint, Point currentPoint)
+    {
+        // Для куба в rubber band використовуємо ту ж логіку що і для кінцевої фігури
+        var rect = BuildRectFromCenter(startPoint, currentPoint);
+        var depth = Math.Min(rect.Width, rect.Height) / 3;
+        
+        // Передній прямокутник
+        ctx.DrawRectangle(null, pen, rect);
+        
+        // Задній прямокутник (зміщений)
+        var backRect = new Rect(
+            rect.X + depth, rect.Y - depth,
+            rect.Width, rect.Height
+        );
+        ctx.DrawRectangle(null, pen, backRect);
+        
+        // З'єднувальні лінії
+        ctx.DrawLine(pen, rect.TopLeft, backRect.TopLeft);
+        ctx.DrawLine(pen, rect.TopRight, backRect.TopRight);
+        ctx.DrawLine(pen, rect.BottomLeft, backRect.BottomLeft);
+        ctx.DrawLine(pen, rect.BottomRight, backRect.BottomRight);
+    }
+
+    public override void CalculateFinalCoordinates(Point startPoint, Point endPoint)
+    {
+        // Варіант 17: куб від центру до кута
+        var rect = BuildRectFromCenter(startPoint, endPoint);
+        Set((long)rect.TopLeft.X, (long)rect.TopLeft.Y, (long)rect.BottomRight.X, (long)rect.BottomRight.Y);
+    }
+
+    private static Rect BuildRectFromCenter(Point center, Point corner)
+    {
+        var centerX = center.X;
+        var centerY = center.Y;
+        var cornerX = corner.X;
+        var cornerY = corner.Y;
+        
+        var x1 = 2 * centerX - cornerX;
+        var y1 = 2 * centerY - cornerY;
+        
+        return new Rect(new Point(x1, y1), new Point(cornerX, cornerY)).Normalize();
+    }
 }

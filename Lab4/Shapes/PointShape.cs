@@ -15,4 +15,14 @@ public sealed class PointShape : ShapeBase
         var rect = new Rect(P1.X - radius, P1.Y - radius, radius * 2, radius * 2);
         ctx.DrawEllipse(Brushes.Black, null, rect.Center, radius, radius);
     }
+
+    public override ShapeBase CreateInstance(Point startPoint)
+    {
+        return new PointShape(startPoint.X, startPoint.Y);
+    }
+
+    public override void PaintRubberBand(DrawingContext ctx, Pen pen, Point startPoint, Point currentPoint)
+    {
+        ctx.DrawEllipse(null, pen, currentPoint, 2, 2);
+    }
 }

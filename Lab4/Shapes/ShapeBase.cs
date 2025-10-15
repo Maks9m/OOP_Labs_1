@@ -21,4 +21,20 @@ public abstract class ShapeBase
     }
 
     public abstract void Render(DrawingContext ctx);
+
+    // Віртуальні методи для зменшення кількості switch cases
+    public abstract ShapeBase CreateInstance(Point startPoint);
+    
+    public virtual void PaintRubberBand(DrawingContext ctx, Pen pen, Point startPoint, Point currentPoint)
+    {
+        // За замовчуванням - просто малюємо від початкової до поточної точки
+        // Переозначається в дочірніх класах для специфічної логіки
+    }
+
+    // Віртуальний метод для обчислення координат при завершенні малювання
+    public virtual void CalculateFinalCoordinates(Point startPoint, Point endPoint)
+    {
+        // За замовчуванням - прямо встановлюємо координати
+        Set((long)startPoint.X, (long)startPoint.Y, (long)endPoint.X, (long)endPoint.Y);
+    }
 }

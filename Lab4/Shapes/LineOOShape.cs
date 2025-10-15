@@ -45,4 +45,17 @@ public sealed class LineOOShape : ShapeBase
         _ellipse1.Render(context);
         _ellipse2.Render(context);
     }
+
+    public override ShapeBase CreateInstance(Point startPoint)
+    {
+        return new LineOOShape(startPoint.X, startPoint.Y, startPoint.X, startPoint.Y);
+    }
+
+    public override void PaintRubberBand(DrawingContext ctx, Pen pen, Point startPoint, Point currentPoint)
+    {
+        // Лінія з кружечками
+        ctx.DrawLine(pen, startPoint, currentPoint);
+        ctx.DrawEllipse(null, pen, startPoint, 5, 5);
+        ctx.DrawEllipse(null, pen, currentPoint, 5, 5);
+    }
 }
