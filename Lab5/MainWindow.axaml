@@ -1,0 +1,61 @@
+<Window xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Lab5.Controls"
+    x:Class="Lab5.MainWindow"
+    Title="Lab5" Width="1400" Height="800"
+    RequestedThemeVariant="Light">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Файл" Click="File_Click" />
+            <MenuItem Header="Таблиця" Click="Table_Click" />
+            <MenuItem x:Name="ObjectsMenuItem" Header="Обʼєкти">
+                <MenuItem>
+                    <MenuItem.Header>
+                        <RadioButton x:Name="MenuPoint" GroupName="ShapeGroup" Content="Точка" Tag="Point" IsChecked="True" Checked="ShapeRadio_Checked"/>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem>
+                    <MenuItem.Header>
+                        <RadioButton x:Name="MenuLine" GroupName="ShapeGroup" Content="Лінія" Tag="Line" Checked="ShapeRadio_Checked"/>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem>
+                    <MenuItem.Header>
+                        <RadioButton x:Name="MenuEllipse" GroupName="ShapeGroup" Content="Еліпс" Tag="Ellipse" Checked="ShapeRadio_Checked"/>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem>
+                    <MenuItem.Header>
+                        <RadioButton x:Name="MenuRect" GroupName="ShapeGroup" Content="Прямокутник" Tag="Rectangle" Checked="ShapeRadio_Checked"/>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem>
+                    <MenuItem.Header>
+                        <RadioButton x:Name="MenuLineOO" GroupName="ShapeGroup" Content="Лінія з кружечками" Tag="LineOO" Checked="ShapeRadio_Checked"/>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem>
+                    <MenuItem.Header>
+                        <RadioButton x:Name="MenuCube" GroupName="ShapeGroup" Content="Каркас куба" Tag="Cube" Checked="ShapeRadio_Checked"/>
+                    </MenuItem.Header>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Довідка" Click="Help_Click" />
+        </Menu>
+        <Border DockPanel.Dock="Top" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="0,0,0,1" Padding="5">
+            <StackPanel Orientation="Horizontal" Spacing="5">
+                <ToggleButton x:Name="TbPoint" Content="•" ToolTip.Tip="Точка" IsChecked="True" Click="Toolbar_Toggle_Click" Width="40" Height="40"/>
+                <ToggleButton x:Name="TbLine" Content="/" ToolTip.Tip="Лінія" Click="Toolbar_Toggle_Click" Width="40" Height="40"/>
+                <ToggleButton x:Name="TbEllipse" Content="○" ToolTip.Tip="Еліпс" Click="Toolbar_Toggle_Click" Width="40" Height="40"/>
+                <ToggleButton x:Name="TbRect" Content="▭" ToolTip.Tip="Прямокутник" Click="Toolbar_Toggle_Click" Width="40" Height="40"/>
+                <ToggleButton x:Name="TbLineOO" Content="⊙⊙" ToolTip.Tip="Лінія з кружечками" Click="Toolbar_Toggle_Click" Width="40" Height="40"/>
+                <ToggleButton x:Name="TbCube" Content="◫" ToolTip.Tip="Каркас куба" Click="Toolbar_Toggle_Click" Width="40" Height="40"/>
+            </StackPanel>
+        </Border>
+    <local:EditorCanvas x:Name="EditorCanvas"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Focusable="True"
+            Cursor="Cross"/>
+    </DockPanel>
+</Window>

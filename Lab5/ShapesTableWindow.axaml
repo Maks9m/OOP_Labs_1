@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:table="clr-namespace:Lab5.Table"
+        x:Class="Lab5.ShapesTableWindow"
+        x:DataType="table:MyTable"
+        Title="Таблиця об'єктів" Width="600" Height="400"
+        RequestedThemeVariant="Light">
+    <DockPanel>
+        <TextBlock DockPanel.Dock="Top" 
+                   Text="Список геометричних об'єктів"
+                   FontSize="16" FontWeight="Bold"
+                   Margin="10" HorizontalAlignment="Center"/>
+        
+        <DataGrid ItemsSource="{Binding Rows}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  GridLinesVisibility="All"
+                  BorderThickness="1"
+                  BorderBrush="Gray"
+                  Margin="10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Назва" Binding="{Binding Name}" Width="*" x:DataType="table:ShapeTableRow"/>
+                <DataGridTextColumn Header="x1" Binding="{Binding X1}" Width="80" x:DataType="table:ShapeTableRow"/>
+                <DataGridTextColumn Header="y1" Binding="{Binding Y1}" Width="80" x:DataType="table:ShapeTableRow"/>
+                <DataGridTextColumn Header="x2" Binding="{Binding X2}" Width="80" x:DataType="table:ShapeTableRow"/>
+                <DataGridTextColumn Header="y2" Binding="{Binding Y2}" Width="80" x:DataType="table:ShapeTableRow"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>

@@ -100,3 +100,4 @@ PublishProfiles/
 # JetBrains Rider HTTP requests
 .idea/httpRequests/
 
+/Lab5/shapes.txt
