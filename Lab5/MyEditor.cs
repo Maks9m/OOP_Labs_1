@@ -11,11 +11,9 @@ namespace Lab5;
 
 public sealed class MyEditor
 {
-    // Варіант 16: класична реалізація Singleton (парний номер)
     private static MyEditor? _instance;
     private static readonly object _lock = new();
     
-    // Приватний конструктор для Singleton
     private MyEditor()
     {
         // Конструктор

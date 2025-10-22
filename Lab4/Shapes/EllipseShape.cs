@@ -3,7 +3,7 @@ using Avalonia.Media;
 
 namespace Lab4.Shapes;
 
-public sealed class EllipseShape : ShapeBase
+public sealed class EllipseShape : ShapeBase, IEllipseDrawable
 {
     public IBrush? Fill { get; init; }
     public Pen Pen { get; init; } = new Pen(Brushes.Black, 1);
@@ -13,7 +13,12 @@ public sealed class EllipseShape : ShapeBase
     public override void Render(DrawingContext ctx)
     {
         var rect = new Rect(P1, P2).Normalize();
-        ctx.DrawEllipse(Fill, Pen, rect.Center, rect.Width/2, rect.Height/2);
+        ctx.DrawEllipse(Fill, Pen, rect.Center, rect.Width / 2, rect.Height / 2);
+    }
+    
+    public void DrawEllipse(DrawingContext ctx)
+    {
+        Render(ctx);
     }
 
     public override ShapeBase CreateInstance(Point startPoint)

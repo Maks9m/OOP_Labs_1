@@ -3,7 +3,7 @@ using Avalonia.Media;
 
 namespace Lab5.Shapes;
 
-public sealed class RectShape : ShapeBase
+public sealed class RectShape : ShapeBase, IRectDrawable
 {
     public IBrush? Fill { get; init; }
     public Pen Pen { get; init; } = new Pen(Brushes.Black, 1);
@@ -47,5 +47,10 @@ public sealed class RectShape : ShapeBase
         var y1 = 2 * centerY - cornerY;
         
         return new Rect(new Point(x1, y1), new Point(cornerX, cornerY)).Normalize();
+    }
+
+    public void DrawRect(DrawingContext ctx)
+    {
+        Render(ctx);
     }
 }

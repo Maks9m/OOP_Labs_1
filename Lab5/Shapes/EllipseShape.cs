@@ -3,7 +3,7 @@ using Avalonia.Media;
 
 namespace Lab5.Shapes;
 
-public sealed class EllipseShape : ShapeBase
+public sealed class EllipseShape : ShapeBase, IEllipseDrawable
 {
     public IBrush? Fill { get; init; }
     public Pen Pen { get; init; } = new Pen(Brushes.Black, 1);
@@ -28,5 +28,10 @@ public sealed class EllipseShape : ShapeBase
         // Варіант 17: еліпс по двом протилежним кутам
         var ellipseRect = new Rect(startPoint, currentPoint).Normalize();
         ctx.DrawEllipse(null, pen, ellipseRect.Center, ellipseRect.Width/2, ellipseRect.Height/2);
+    }
+
+    public void DrawEllipse(DrawingContext ctx)
+    {
+        Render(ctx);
     }
 }

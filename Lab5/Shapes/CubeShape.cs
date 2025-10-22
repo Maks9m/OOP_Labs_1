@@ -4,8 +4,8 @@ using System;
 
 namespace Lab5.Shapes;
 
-// Каркас куба - множинне успадкування через композицію
-public sealed class CubeShape : ShapeBase
+// Каркас куба - множинне успадкування через інтерфейси
+public sealed class CubeShape : ShapeBase, IRectDrawable, ILineDrawable
 {
     private RectShape _frontRect;
     private RectShape _backRect;
@@ -68,12 +68,21 @@ public sealed class CubeShape : ShapeBase
     public override void Render(DrawingContext context)
     {
         // Використовуємо методи Show базових класів (поліморфізм)
-        _frontRect.Render(context);
-        _backRect.Render(context);
-        
+        DrawRect(context);
+        DrawLine(context);
+    }
+
+    public void DrawRect(DrawingContext ctx)
+    {
+        _frontRect.DrawRect(ctx);
+        _backRect.DrawRect(ctx);
+    }
+
+    public void DrawLine(DrawingContext ctx)
+    {
         foreach (var line in _connectionLines)
         {
-            line.Render(context);
+            line.DrawLine(ctx);
         }
     }
     
@@ -109,7 +118,6 @@ public sealed class CubeShape : ShapeBase
 
     public override void CalculateFinalCoordinates(Point startPoint, Point endPoint)
     {
-        // Варіант 17: куб від центру до кута
         var rect = BuildRectFromCenter(startPoint, endPoint);
         Set((long)rect.TopLeft.X, (long)rect.TopLeft.Y, (long)rect.BottomRight.X, (long)rect.BottomRight.Y);
     }

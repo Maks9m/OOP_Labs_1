@@ -3,7 +3,7 @@ using Avalonia.Media;
 
 namespace Lab5.Shapes;
 
-public sealed class LineShape : ShapeBase
+public sealed class LineShape : ShapeBase, ILineDrawable
 {
     public Pen Pen { get; init; } = new Pen(Brushes.Black, 1);
 
@@ -25,5 +25,10 @@ public sealed class LineShape : ShapeBase
     public override void PaintRubberBand(DrawingContext ctx, Pen pen, Point startPoint, Point currentPoint)
     {
         ctx.DrawLine(pen, startPoint, currentPoint);
+    }
+
+    public void DrawLine(DrawingContext ctx)
+    {
+        Render(ctx);
     }
 }

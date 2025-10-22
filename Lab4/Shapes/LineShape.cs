@@ -3,7 +3,7 @@ using Avalonia.Media;
 
 namespace Lab4.Shapes;
 
-public sealed class LineShape : ShapeBase
+public sealed class LineShape : ShapeBase, ILineDrawable
 {
     public Pen Pen { get; init; } = new Pen(Brushes.Black, 1);
 
@@ -13,6 +13,11 @@ public sealed class LineShape : ShapeBase
     public override void Render(DrawingContext ctx)
     {
         ctx.DrawLine(Pen, P1, P2);
+    }
+
+    public void DrawLine(DrawingContext ctx)
+    {
+        Render(ctx);
     }
 
     public override ShapeBase CreateInstance(Point startPoint)

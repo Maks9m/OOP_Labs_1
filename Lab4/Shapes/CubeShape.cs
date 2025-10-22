@@ -5,7 +5,7 @@ using System;
 namespace Lab4.Shapes;
 
 // Каркас куба - множинне успадкування через композицію
-public sealed class CubeShape : ShapeBase
+public sealed class CubeShape : ShapeBase, IRectDrawable, ILineDrawable
 {
     private RectShape _frontRect;
     private RectShape _backRect;
@@ -62,16 +62,24 @@ public sealed class CubeShape : ShapeBase
         );
     }
 
-    public override void Render(DrawingContext context)
+    public void DrawRectangle(DrawingContext ctx)
     {
-        // Використовуємо методи Show базових класів (поліморфізм)
-        _frontRect.Render(context);
-        _backRect.Render(context);
-        
+        _frontRect.DrawRectangle(ctx);
+        _backRect.DrawRectangle(ctx);
+    }
+
+    public void DrawLine(DrawingContext ctx)   
+    {
         foreach (var line in _connectionLines)
         {
-            line.Render(context);
+            line.DrawLine(ctx);
         }
+    }
+
+    public override void Render(DrawingContext ctx)
+    {
+        DrawRectangle(ctx);
+        DrawLine(ctx);
     }
 
     public override ShapeBase CreateInstance(Point startPoint)

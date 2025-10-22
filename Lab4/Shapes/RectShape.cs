@@ -3,7 +3,7 @@ using Avalonia.Media;
 
 namespace Lab4.Shapes;
 
-public sealed class RectShape : ShapeBase
+public sealed class RectShape : ShapeBase, IRectDrawable
 {
     public IBrush? Fill { get; init; }
     public Pen Pen { get; init; } = new Pen(Brushes.Black, 1);
@@ -19,6 +19,12 @@ public sealed class RectShape : ShapeBase
     public override ShapeBase CreateInstance(Point startPoint)
     {
         return new RectShape(startPoint, startPoint) { Fill = Brushes.Gray };
+    }
+
+    public void DrawRectangle(DrawingContext ctx)
+    {
+        var rect = new Rect(P1, P2).Normalize();
+        ctx.DrawRectangle(Fill, Pen, rect);
     }
 
     public override void PaintRubberBand(DrawingContext ctx, Pen pen, Point startPoint, Point currentPoint)
