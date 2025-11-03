@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Object2.MainWindow"
+        Title="Object2 - Генератор даних" 
+        Width="500" Height="600"
+        RequestedThemeVariant="Light">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Файл">
+                <MenuItem Header="Генерувати дані" Click="Generate_Click"/>
+                <Separator/>
+                <MenuItem Header="Вихід" Click="Exit_Click"/>
+            </MenuItem>
+        </Menu>
+        
+        <ScrollViewer DockPanel.Dock="Fill">
+            <StackPanel Margin="20" Spacing="10">
+                <TextBlock Text="Згенеровані дані:" FontWeight="Bold" FontSize="14"/>
+                <Border BorderBrush="Gray" BorderThickness="1" Padding="10" Background="#F5F5F5">
+                    <TextBlock x:Name="DataTextBlock" 
+                               Text="Очікування команди..."
+                               TextWrapping="Wrap"
+                               FontFamily="Consolas,Courier New,monospace"/>
+                </Border>
+                
+                <TextBlock Text="Статус:" FontWeight="Bold" FontSize="14" Margin="0,20,0,0"/>
+                <TextBlock x:Name="StatusTextBlock" Text="Готовий" TextWrapping="Wrap"/>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

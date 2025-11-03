@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Object3.Controls"
+        x:Class="Object3.MainWindow"
+        Title="Object3 - Візуалізатор графіків" 
+        Width="700" Height="600"
+        RequestedThemeVariant="Light">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Файл">
+                <MenuItem Header="Оновити дані" Click="Update_Click"/>
+                <Separator/>
+                <MenuItem Header="Вихід" Click="Exit_Click"/>
+            </MenuItem>
+        </Menu>
+        
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+            <TextBlock x:Name="StatusTextBlock" Text="Готовий" />
+        </StackPanel>
+        
+        <Border BorderBrush="Gray" BorderThickness="1" Margin="10">
+            <local:ChartCanvas x:Name="ChartCanvas" Background="White"/>
+        </Border>
+    </DockPanel>
+</Window>
