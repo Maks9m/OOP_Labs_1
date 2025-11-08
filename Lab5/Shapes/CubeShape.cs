@@ -11,19 +11,21 @@ public sealed class CubeShape : ShapeBase, IRectDrawable, ILineDrawable
     private RectShape _backRect;
     private LineShape[] _connectionLines;
 
+    public CubeShape(int x1, int y1, int x2, int y2) : this(new Point(x1, y1), new Point(x2, y2)) { }
+
     public CubeShape(Point topLeft, Point bottomRight) : base(topLeft, bottomRight)
     {
         var rect = new Rect(topLeft, bottomRight).Normalize();
         var depth = Math.Min(rect.Width, rect.Height) / 3;
-        
+
         // Передній прямокутник
         _frontRect = new RectShape(topLeft, bottomRight) { Fill = null };
-        
+
         // Задній прямокутник (зміщений)
         var backTopLeft = new Point(rect.X + depth, rect.Y - depth);
         var backBottomRight = new Point(rect.Right + depth, rect.Bottom - depth);
         _backRect = new RectShape(backTopLeft, backBottomRight) { Fill = null };
-        
+
         // З'єднувальні лінії
         _connectionLines = new LineShape[4];
         UpdateConnectionLines(rect, depth);
@@ -33,14 +35,14 @@ public sealed class CubeShape : ShapeBase, IRectDrawable, ILineDrawable
     {
         // Оновлюємо базові координати
         base.Set(x1, y1, x2, y2);
-        
+
         var rect = new Rect(new Point(x1, y1), new Point(x2, y2)).Normalize();
         var depth = Math.Min(rect.Width, rect.Height) / 3;
-        
+
         _frontRect.Set(x1, y1, x2, y2);
-        _backRect.Set((long)(rect.X + depth), (long)(rect.Y - depth), 
+        _backRect.Set((long)(rect.X + depth), (long)(rect.Y - depth),
                      (long)(rect.Right + depth), (long)(rect.Bottom - depth));
-        
+
         UpdateConnectionLines(rect, depth);
     }
 
@@ -85,7 +87,7 @@ public sealed class CubeShape : ShapeBase, IRectDrawable, ILineDrawable
             line.DrawLine(ctx);
         }
     }
-    
+
     public override string GetShapeName() => "Куб";
 
     public override ShapeBase CreateInstance(Point startPoint)
@@ -98,17 +100,17 @@ public sealed class CubeShape : ShapeBase, IRectDrawable, ILineDrawable
         // Для куба в rubber band використовуємо ту ж логіку що і для кінцевої фігури
         var rect = BuildRectFromCenter(startPoint, currentPoint);
         var depth = Math.Min(rect.Width, rect.Height) / 3;
-        
+
         // Передній прямокутник
         ctx.DrawRectangle(null, pen, rect);
-        
+
         // Задній прямокутник (зміщений)
         var backRect = new Rect(
             rect.X + depth, rect.Y - depth,
             rect.Width, rect.Height
         );
         ctx.DrawRectangle(null, pen, backRect);
-        
+
         // З'єднувальні лінії
         ctx.DrawLine(pen, rect.TopLeft, backRect.TopLeft);
         ctx.DrawLine(pen, rect.TopRight, backRect.TopRight);
@@ -128,10 +130,10 @@ public sealed class CubeShape : ShapeBase, IRectDrawable, ILineDrawable
         var centerY = center.Y;
         var cornerX = corner.X;
         var cornerY = corner.Y;
-        
+
         var x1 = 2 * centerX - cornerX;
         var y1 = 2 * centerY - cornerY;
-        
+
         return new Rect(new Point(x1, y1), new Point(cornerX, cornerY)).Normalize();
     }
 }

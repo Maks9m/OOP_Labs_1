@@ -121,9 +121,37 @@ public sealed class MyEditor
         _currentShape.PaintRubberBand(context, pen, _startPoint, _currentPoint);
     }
 
+    public void LoadShapesFromFile(string path)
+    {
+        if (!File.Exists(path)) return;
 
+        foreach (var line in File.ReadAllLines(path))
+        {
+            var parts = line.Split('\t');
+            if (parts.Length < 5) continue;
+            string name = parts[0].Trim();
+            if (!int.TryParse(parts[1], out int x1)) continue;
+            int.TryParse(parts[2], out int y1);
+            int.TryParse(parts[3], out int x2);
+            int.TryParse(parts[4], out int y2);
 
+            ShapeBase? shape = name switch
+            {
+                "Точка" => new PointShape(x1, y1),
+                "Лінія" => new LineShape(x1, y1, x2, y2),
+                "Прямокутник" => new RectShape(x1, y1, x2, y2),
+                "Еліпс" => new EllipseShape(x1, y1, x2, y2),
+                "Лінія з кружечками" => new LineOOShape(x1, y1, x2, y2),
+                "Куб" => new CubeShape(x1, y1, x2, y2),
+                _ => null
+            };
 
+            if (shape != null)
+            {
+                _shapes.Add(shape);
+            }
+        }
+    }
 
     private void AddShape(ShapeBase shape)
     {

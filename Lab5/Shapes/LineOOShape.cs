@@ -10,6 +10,12 @@ public sealed class LineOOShape : ShapeBase, ILineDrawable, IEllipseDrawable
     private EllipseShape _ellipse1;
     private EllipseShape _ellipse2;
 
+    // Alternative constructor that accepts Avalonia Points.
+    // It forwards to the primary double-based constructor to avoid code duplication.
+    public LineOOShape(Point p1, Point p2) : this(p1.X, p1.Y, p2.X, p2.Y)
+    {
+    }
+
     public LineOOShape(double x1, double y1, double x2, double y2) : base(new Point(x1, y1), new Point(x2, y2))
     {
         _lineShape = new LineShape(x1, y1, x2, y2);

@@ -9,6 +9,7 @@ public sealed class RectShape : ShapeBase, IRectDrawable
     public Pen Pen { get; init; } = new Pen(Brushes.Black, 1);
 
     public RectShape(Point p1, Point p2) : base(p1, p2) { }
+    public RectShape(int x1, int y1, int x2, int y2) : base(new Point(x1, y1), new Point(x2, y2)) { }
 
     public override void Render(DrawingContext ctx)
     {

@@ -9,6 +9,7 @@ public sealed class EllipseShape : ShapeBase, IEllipseDrawable
     public Pen Pen { get; init; } = new Pen(Brushes.Black, 1);
 
     public EllipseShape(Point p1, Point p2) : base(p1, p2) { }
+    public EllipseShape(int x1, int y1, int x2, int y2) : base(new Point(x1, y1), new Point(x2, y2)) { }
 
     public override void Render(DrawingContext ctx)
     {

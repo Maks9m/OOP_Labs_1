@@ -3,6 +3,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using System.IO;
 using Lab5.Shapes;
 using Lab5.Controls;
 using Lab5.Table;
@@ -19,9 +20,10 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         UpdateWindowTitle();
-        
+
         // Підписуємось на подію додавання фігури
         MyEditor.Instance.ShapeAdded += OnShapeAdded;
+        MyEditor.Instance.LoadShapesFromFile("shapes.txt");
     }
     
     private void OnShapeAdded(ShapeBase shape)
@@ -40,7 +42,7 @@ public partial class MainWindow : Window
     {
 
     }
-    
+
     private void Table_Click(object sender, RoutedEventArgs e)
     {
         if (_tableWindow == null || !_tableWindow.IsVisible)
@@ -226,7 +228,7 @@ public partial class MainWindow : Window
     {
 
     }
-    
+
     private void UpdateWindowTitle()
     {
         // Варіант 17: Ж mod 2 = 1, тому показуємо поточний тип в заголовку
