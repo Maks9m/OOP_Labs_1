@@ -25,4 +25,11 @@ public class MyTable
     
     // Отримання кількості рядків
     public int Count => _rows.Count;
+
+    // Видалення рядка за індексом
+    public void RemoveAt(int index)
+    {
+        if (index < 0 || index >= _rows.Count) return;
+        _rows.RemoveAt(index);
+    }
 }

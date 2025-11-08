@@ -11,9 +11,12 @@
                    FontSize="16" FontWeight="Bold"
                    Margin="10" HorizontalAlignment="Center"/>
         
-        <DataGrid ItemsSource="{Binding Rows}"
+    <DataGrid x:Name="TableGrid" ItemsSource="{Binding Rows}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
+          SelectionMode="Single"
+          SelectionChanged="TableGrid_SelectionChanged"
+          KeyDown="TableGrid_KeyDown"
                   GridLinesVisibility="All"
                   BorderThickness="1"
                   BorderBrush="Gray"

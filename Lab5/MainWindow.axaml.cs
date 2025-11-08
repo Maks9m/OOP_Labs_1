@@ -24,6 +24,13 @@ public partial class MainWindow : Window
         // Підписуємось на подію додавання фігури
         MyEditor.Instance.ShapeAdded += OnShapeAdded;
         MyEditor.Instance.LoadShapesFromFile("shapes.txt");
+
+            // Якщо були завантажені фігури з файлу, додаємо їх до таблиці
+            foreach (var s in MyEditor.Instance.Shapes)
+            {
+                if (s is null) continue;
+                _table.Add(s.GetShapeName(), (int)s.P1.X, (int)s.P1.Y, (int)s.P2.X, (int)s.P2.Y);
+            }
     }
     
     private void OnShapeAdded(ShapeBase shape)
@@ -48,7 +55,24 @@ public partial class MainWindow : Window
         if (_tableWindow == null || !_tableWindow.IsVisible)
         {
             // Створюємо та відкриваємо немодальне вікно таблиці
-            _tableWindow = new ShapesTableWindow(_table);
+                _tableWindow = new ShapesTableWindow(_table);
+                // Підписуємось на події вибору рядка та видалення
+                _tableWindow.RowSelected += (s, idx) =>
+                {
+                    // Виділяємо фігуру в редакторі (або очищаємо виділення)
+                    MyEditor.Instance.HighlightShape(idx);
+                    // Перемалювати канву
+                    EditorCanvas.InvalidateVisual();
+                };
+
+                _tableWindow.RowDeleteRequested += (s, idx) =>
+                {
+                    // Видаляємо фігуру з редактора та з таблиці
+                    MyEditor.Instance.RemoveAt(idx);
+                    _table.RemoveAt(idx);
+                    // Перемалювати канву
+                    EditorCanvas.InvalidateVisual();
+                };
             _tableWindow.Closed += (s, args) => _tableWindow = null;
             _tableWindow.Show();
         }

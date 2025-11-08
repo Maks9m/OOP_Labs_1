@@ -48,6 +48,8 @@ public sealed class MyEditor
 
     // Event для оповіщення про додавання нової фігури
     public event Action<ShapeBase>? ShapeAdded;
+    // Event для оповіщення про видалення фігури
+    public event Action<int>? ShapeRemoved;
     
     // Шлях до файлу для збереження фігур
     private const string ShapesFilePath = "shapes.txt";
@@ -95,9 +97,38 @@ public sealed class MyEditor
         context.FillRectangle(Brushes.WhiteSmoke, bgRect);
 
         // Малюємо всі збережені фігури
-        foreach (var shape in _shapes.Where(s => s is not null))
+        for (int i = 0; i < _shapes.Count; i++)
         {
-            shape!.Render(context);
+            var shape = _shapes[i];
+            if (shape is null) continue;
+            shape.Render(context);
+
+            // Якщо ця фігура підсвічена, малюємо навколо неї прямокутник-підсвітку
+            if (_highlightIndex.HasValue && _highlightIndex.Value == i)
+            {
+                var x1 = Math.Min(shape.P1.X, shape.P2.X);
+                var y1 = Math.Min(shape.P1.Y, shape.P2.Y);
+                var x2 = Math.Max(shape.P1.X, shape.P2.X);
+                var y2 = Math.Max(shape.P1.Y, shape.P2.Y);
+                var w = x2 - x1;
+                var h = y2 - y1;
+                var highlightPen = new Pen(Brushes.Red, 2) { DashStyle = new DashStyle(new double[] {4,4}, 0) };
+
+                // Special-case small/point shapes: draw an ellipse marker so the highlight is visible
+                if (w < 4 && h < 4)
+                {
+                    // Draw a small circle around the point
+                    var center = shape.P1;
+                    double r = 8.0;
+                    // DrawEllipse(brush, pen, center, radiusX, radiusY)
+                    context.DrawEllipse(null, highlightPen, center, r, r);
+                }
+                else
+                {
+                    var rect = new Rect(new Point(x1, y1), new Point(x2, y2));
+                    context.DrawRectangle(null, highlightPen, rect);
+                }
+            }
         }
 
         // Малюємо rubber band
@@ -150,6 +181,44 @@ public sealed class MyEditor
             {
                 _shapes.Add(shape);
             }
+        }
+    }
+
+    // Highlight a shape at given index (or clear if null)
+    private int? _highlightIndex;
+    public void HighlightShape(int? index)
+    {
+        if (index.HasValue && (index.Value < 0 || index.Value >= _shapes.Count))
+            _highlightIndex = null;
+        else
+            _highlightIndex = index;
+    }
+
+    // Remove shape at given index and rewrite storage file
+    public void RemoveAt(int index)
+    {
+        if (index < 0 || index >= _shapes.Count) return;
+        _shapes.RemoveAt(index);
+        // Update persistent storage by rewriting the file
+        RewriteShapesFile();
+        ShapeRemoved?.Invoke(index);
+    }
+
+    private void RewriteShapesFile()
+    {
+        try
+        {
+            using var writer = new StreamWriter(ShapesFilePath, append: false);
+            foreach (var shape in _shapes.Where(s => s is not null))
+            {
+                var s = shape!;
+                var line = $"{s.GetShapeName()}\t{(int)s.P1.X}\t{(int)s.P1.Y}\t{(int)s.P2.X}\t{(int)s.P2.Y}";
+                writer.WriteLine(line);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Помилка перезапису файлу: {ex.Message}");
         }
     }
 
