@@ -46,6 +46,20 @@ public partial class MainWindow : Window
             {
                 await GenerateData();
             }
+            else if (message.StartsWith("PARAMS:", StringComparison.OrdinalIgnoreCase))
+            {
+                // PARAMS:n;xMin;xMax;yMin;yMax
+                var payload = message.Substring("PARAMS:".Length).Trim();
+                if (TryParseParams(payload, out var p))
+                {
+                    await GenerateData(p.n, p.xMin, p.xMax, p.yMin, p.yMax);
+                }
+            }
+            else if (string.Equals(message, "EXIT", StringComparison.OrdinalIgnoreCase))
+            {
+                _messageServer?.Dispose();
+                Close();
+            }
         });
     }
 
@@ -111,6 +125,53 @@ public partial class MainWindow : Window
         {
             StatusTextBlock.Text = $"Помилка: {ex.Message}";
         }
+    }
+
+    private async Task GenerateData(int nPoints, int xMin, int xMax, int yMin, int yMax)
+    {
+        try
+        {
+            StatusTextBlock.Text = $"Генерація {nPoints} точок...";
+
+            // Генеруємо випадкові дані
+            var random = new Random();
+            _generatedData.Clear();
+
+            for (int i = 0; i < nPoints; i++)
+            {
+                int x = random.Next(xMin, xMax + 1);
+                int y = random.Next(yMin, yMax + 1);
+                _generatedData.Add((x, y));
+            }
+
+            _generatedData = _generatedData.OrderBy(p => p.x).ToList();
+
+            DisplayData();
+            await CopyToClipboard();
+
+            StatusTextBlock.Text = $"Згенеровано {nPoints} точок та скопійовано у Clipboard";
+
+            await Communication.MessageClient.SendMessageAsync("Lab6_Main", "OBJECT2_COMPLETED");
+        }
+        catch (Exception ex)
+        {
+            StatusTextBlock.Text = $"Помилка: {ex.Message}";
+        }
+    }
+
+    private static bool TryParseParams(string payload, out (int n, int xMin, int xMax, int yMin, int yMax) p)
+    {
+        p = default;
+        var parts = payload.Split(';');
+        if (parts.Length != 5) return false;
+        bool ok = int.TryParse(parts[0], out int n)
+               && int.TryParse(parts[1], out int xMin)
+               && int.TryParse(parts[2], out int xMax)
+               && int.TryParse(parts[3], out int yMin)
+               && int.TryParse(parts[4], out int yMax);
+        if (!ok || n <= 0 || xMin > xMax || yMin > yMax) return false;
+        p = (n, xMin, xMax, yMin, yMax);
+        return true;
     }
 
     private void DisplayData()

@@ -68,12 +68,25 @@ public partial class MainWindow : Window
         }
 
         AddLog($"Параметри: nPoints={result.NPoints}, xMin={result.XMin}, xMax={result.XMax}, yMin={result.YMin}, yMax={result.YMax}");
-        
-        // Зберігаємо параметри у файл для Object2
+
+        // Опціонально збережемо параметри у файл як fallback (Object2 все одно отримає їх через pipe)
         await SaveParametersToFile(result);
-        
-        // Запускаємо Object2
+
+        // Запускаємо/забезпечуємо Object2
         await StartObject2();
+
+        // Надсилаємо параметри через Named Pipe (кросплатформенно)
+        var msg = $"PARAMS:{result.NPoints};{result.XMin};{result.XMax};{result.YMin};{result.YMax}";
+        var sent = await MessageClient.SendMessageAsync("Object2_Pipe", msg);
+        if (!sent)
+        {
+            AddLog("Не вдалося надіслати параметри до Object2 через pipe. Перевірте, що Object2 запущений.");
+            StatusTextBlock.Text = "Помилка IPC із Object2";
+            return;
+        }
+
+        // Додатково можемо ініціювати старт
+        await MessageClient.SendMessageAsync("Object2_Pipe", "START");
     }
 
     private async Task SaveParametersToFile(ParametersDialog.Parameters parameters)
@@ -88,7 +101,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Object2.exe");
+            string exePath = ResolveExecutablePath("Object2");
             
             // Перевіряємо чи Object2 вже запущений
             if (_object2Process != null && !_object2Process.HasExited)
@@ -132,7 +145,7 @@ public partial class MainWindow : Window
         {
             await Task.Delay(1000); // Невелика затримка для завершення запису в clipboard
             
-            string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Object3.exe");
+            string exePath = ResolveExecutablePath("Object3");
             
             // Перевіряємо чи Object3 вже запущений
             if (_object3Process != null && !_object3Process.HasExited)
@@ -170,6 +183,19 @@ public partial class MainWindow : Window
         }
     }
 
+    private static string ResolveExecutablePath(string baseName)
+    {
+        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Перевіряємо .exe (Windows)
+        var exe = Path.Combine(baseDir, baseName + ".exe");
+        if (File.Exists(exe)) return exe;
+        // Перевіряємо без розширення (Unix/macOS)
+        var noExt = Path.Combine(baseDir, baseName);
+        if (File.Exists(noExt)) return noExt;
+        // Повертаємо шлях з .exe за замовчуванням для повідомлення про помилку
+        return exe;
+    }
+
     private void AddLog(string message)
     {
         string timestamp = DateTime.Now.ToString("HH:mm:ss");
@@ -179,13 +205,13 @@ public partial class MainWindow : Window
 
     private void Exit_Click(object? sender, RoutedEventArgs e)
     {
-        // Закриваємо дочірні процеси
-        try
-        {
-            _object2Process?.Kill();
-            _object3Process?.Kill();
-        }
-        catch { }
+        // Надсилаємо команди EXIT у дочірні процеси для акуратного завершення
+        _ = MessageClient.SendMessageAsync("Object2_Pipe", "EXIT");
+        _ = MessageClient.SendMessageAsync("Object3_Pipe", "EXIT");
+        
+        // Fallback: якщо не завершилися — примусово закриємо
+        try { _object2Process?.Kill(); } catch { }
+        try { _object3Process?.Kill(); } catch { }
         
         _messageServer?.Dispose();
         Close();
@@ -227,13 +253,11 @@ public partial class MainWindow : Window
     protected override void OnClosing(WindowClosingEventArgs e)
     {
         _messageServer?.Dispose();
-        
-        try
-        {
-            _object2Process?.Kill();
-            _object3Process?.Kill();
-        }
-        catch { }
+        // Надсилаємо EXIT й закриваємо як fallback
+        _ = MessageClient.SendMessageAsync("Object2_Pipe", "EXIT");
+        _ = MessageClient.SendMessageAsync("Object3_Pipe", "EXIT");
+        try { _object2Process?.Kill(); } catch { }
+        try { _object3Process?.Kill(); } catch { }
         
         base.OnClosing(e);
     }

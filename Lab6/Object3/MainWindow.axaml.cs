@@ -43,6 +43,11 @@ public partial class MainWindow : Window
             {
                 await LoadDataFromClipboard();
             }
+            else if (string.Equals(message, "EXIT", StringComparison.OrdinalIgnoreCase))
+            {
+                _messageServer?.Dispose();
+                Close();
+            }
         });
     }
 
