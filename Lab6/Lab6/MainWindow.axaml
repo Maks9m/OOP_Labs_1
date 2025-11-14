@@ -17,7 +17,7 @@
             <MenuItem Header="Довідка" Click="Help_Click"/>
         </Menu>
         
-        <ScrollViewer DockPanel.Dock="Fill">
+        <ScrollViewer>
             <StackPanel Margin="20" Spacing="10">
                 <TextBlock Text="Лог роботи системи:" FontWeight="Bold" FontSize="14"/>
                 <Border BorderBrush="Gray" BorderThickness="1" Padding="10" Background="#F5F5F5">
