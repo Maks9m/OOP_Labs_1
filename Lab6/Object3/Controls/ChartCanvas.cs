@@ -7,11 +7,10 @@ using System.Linq;
 
 namespace Object3.Controls;
 
-public class ChartCanvas : Canvas
+public class ChartCanvas : Control
 {
     private List<(int x, int y)> _dataPoints = new();
-    private const int Margin = 60;
-    private const int AxisMargin = 40;
+    private const int ChartMargin = 60;
 
     public void SetData(List<(int x, int y)> data)
     {
@@ -69,8 +68,8 @@ public class ChartCanvas : Canvas
         yMax += yRange / 10;
 
         // Робоча область для графіка
-        double chartWidth = width - 2 * Margin;
-        double chartHeight = height - 2 * Margin;
+    double chartWidth = width - 2 * ChartMargin;
+    double chartHeight = height - 2 * ChartMargin;
 
         // Малюємо осі
         DrawAxes(context, width, height, chartWidth, chartHeight, xMin, xMax, yMin, yMax);
@@ -87,62 +86,62 @@ public class ChartCanvas : Canvas
 
         // Вісь X
         context.DrawLine(axisPen,
-            new Avalonia.Point(Margin, height - Margin),
-            new Avalonia.Point(width - Margin, height - Margin));
+            new Avalonia.Point(ChartMargin, height - ChartMargin),
+            new Avalonia.Point(width - ChartMargin, height - ChartMargin));
 
         // Вісь Y
         context.DrawLine(axisPen,
-            new Avalonia.Point(Margin, Margin),
-            new Avalonia.Point(Margin, height - Margin));
+            new Avalonia.Point(ChartMargin, ChartMargin),
+            new Avalonia.Point(ChartMargin, height - ChartMargin));
 
         // Стрілка на осі X
         context.DrawLine(axisPen,
-            new Avalonia.Point(width - Margin, height - Margin),
-            new Avalonia.Point(width - Margin - 10, height - Margin - 5));
+            new Avalonia.Point(width - ChartMargin, height - ChartMargin),
+            new Avalonia.Point(width - ChartMargin - 10, height - ChartMargin - 5));
         context.DrawLine(axisPen,
-            new Avalonia.Point(width - Margin, height - Margin),
-            new Avalonia.Point(width - Margin - 10, height - Margin + 5));
+            new Avalonia.Point(width - ChartMargin, height - ChartMargin),
+            new Avalonia.Point(width - ChartMargin - 10, height - ChartMargin + 5));
 
         // Стрілка на осі Y
         context.DrawLine(axisPen,
-            new Avalonia.Point(Margin, Margin),
-            new Avalonia.Point(Margin - 5, Margin + 10));
+            new Avalonia.Point(ChartMargin, ChartMargin),
+            new Avalonia.Point(ChartMargin - 5, ChartMargin + 10));
         context.DrawLine(axisPen,
-            new Avalonia.Point(Margin, Margin),
-            new Avalonia.Point(Margin + 5, Margin + 10));
+            new Avalonia.Point(ChartMargin, ChartMargin),
+            new Avalonia.Point(ChartMargin + 5, ChartMargin + 10));
 
         // Підписи осей
-        DrawAxisLabel(context, "X", width - Margin + 15, height - Margin + 5);
-        DrawAxisLabel(context, "Y", Margin - 20, Margin - 10);
+    DrawAxisLabel(context, "X", width - ChartMargin + 15, height - ChartMargin + 5);
+    DrawAxisLabel(context, "Y", ChartMargin - 20, ChartMargin - 10);
 
         // Розмітка осі X
         int xStep = Math.Max(1, (xMax - xMin) / 10);
         for (int x = xMin; x <= xMax; x += xStep)
         {
-            double px = Margin + (x - xMin) * chartWidth / (xMax - xMin);
+            double px = ChartMargin + (x - xMin) * chartWidth / (xMax - xMin);
             
             // Вертикальна сітка
             context.DrawLine(gridPen,
-                new Avalonia.Point(px, Margin),
-                new Avalonia.Point(px, height - Margin));
+                new Avalonia.Point(px, ChartMargin),
+                new Avalonia.Point(px, height - ChartMargin));
             
             // Значення
-            DrawAxisLabel(context, x.ToString(), px - 10, height - Margin + 10);
+            DrawAxisLabel(context, x.ToString(), px - 10, height - ChartMargin + 10);
         }
 
         // Розмітка осі Y
         int yStep = Math.Max(1, (yMax - yMin) / 10);
         for (int y = yMin; y <= yMax; y += yStep)
         {
-            double py = height - Margin - (y - yMin) * chartHeight / (yMax - yMin);
+            double py = height - ChartMargin - (y - yMin) * chartHeight / (yMax - yMin);
             
             // Горизонтальна сітка
             context.DrawLine(gridPen,
-                new Avalonia.Point(Margin, py),
-                new Avalonia.Point(width - Margin, py));
+                new Avalonia.Point(ChartMargin, py),
+                new Avalonia.Point(width - ChartMargin, py));
             
             // Значення
-            DrawAxisLabel(context, y.ToString(), Margin - 35, py - 8);
+            DrawAxisLabel(context, y.ToString(), ChartMargin - 35, py - 8);
         }
     }
 
@@ -169,8 +168,8 @@ public class ChartCanvas : Canvas
         {
             var point = _dataPoints[i];
             
-            double px = Margin + (point.x - xMin) * chartWidth / (xMax - xMin);
-            double py = Bounds.Height - Margin - (point.y - yMin) * chartHeight / (yMax - yMin);
+            double px = ChartMargin + (point.x - xMin) * chartWidth / (xMax - xMin);
+            double py = Bounds.Height - ChartMargin - (point.y - yMin) * chartHeight / (yMax - yMin);
 
             // Малюємо точку
             context.DrawEllipse(pointBrush, null, new Avalonia.Point(px, py), 4, 4);
@@ -179,8 +178,8 @@ public class ChartCanvas : Canvas
             if (i < _dataPoints.Count - 1)
             {
                 var nextPoint = _dataPoints[i + 1];
-                double npx = Margin + (nextPoint.x - xMin) * chartWidth / (xMax - xMin);
-                double npy = Bounds.Height - Margin - (nextPoint.y - yMin) * chartHeight / (yMax - yMin);
+                double npx = ChartMargin + (nextPoint.x - xMin) * chartWidth / (xMax - xMin);
+                double npy = Bounds.Height - ChartMargin - (nextPoint.y - yMin) * chartHeight / (yMax - yMin);
                 
                 context.DrawLine(linePen, new Avalonia.Point(px, py), new Avalonia.Point(npx, npy));
             }

@@ -164,12 +164,16 @@ public partial class MainWindow : Window
         p = default;
         var parts = payload.Split(';');
         if (parts.Length != 5) return false;
-        bool ok = int.TryParse(parts[0], out int n)
-               && int.TryParse(parts[1], out int xMin)
-               && int.TryParse(parts[2], out int xMax)
-               && int.TryParse(parts[3], out int yMin)
-               && int.TryParse(parts[4], out int yMax);
-        if (!ok || n <= 0 || xMin > xMax || yMin > yMax) return false;
+
+        bool okN = int.TryParse(parts[0], out int n);
+        bool okXMin = int.TryParse(parts[1], out int xMin);
+        bool okXMax = int.TryParse(parts[2], out int xMax);
+        bool okYMin = int.TryParse(parts[3], out int yMin);
+        bool okYMax = int.TryParse(parts[4], out int yMax);
+
+        if (!(okN && okXMin && okXMax && okYMin && okYMax)) return false;
+        if (n <= 0 || xMin > xMax || yMin > yMax) return false;
+
         p = (n, xMin, xMax, yMin, yMax);
         return true;
     }

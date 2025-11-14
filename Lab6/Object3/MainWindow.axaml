@@ -18,8 +18,8 @@
             <TextBlock x:Name="StatusTextBlock" Text="Готовий" />
         </StackPanel>
         
-        <Border BorderBrush="Gray" BorderThickness="1" Margin="10">
-            <local:ChartCanvas x:Name="ChartCanvas" Background="White"/>
+        <Border BorderBrush="Gray" BorderThickness="1" Margin="10" Background="White">
+            <local:ChartCanvas x:Name="ChartCanvas"/>
         </Border>
     </DockPanel>
 </Window>
