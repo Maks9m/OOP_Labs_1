@@ -19,16 +19,6 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         InitializeMessageServer();
-        
-        // Автоматично генеруємо дані при запуску
-        _ = Task.Run(async () =>
-        {
-            await Task.Delay(500); // Невелика затримка для ініціалізації
-            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
-            {
-                await GenerateData();
-            });
-        });
     }
 
     private void InitializeMessageServer()
@@ -36,6 +26,8 @@ public partial class MainWindow : Window
         _messageServer = new Communication.MessageServer("Object2_Pipe");
         _messageServer.MessageReceived += OnMessageReceived;
         _messageServer.Start();
+        // Повідомляємо менеджера про готовність до прийому параметрів
+        _ = Communication.MessageClient.SendMessageAsync("Lab6_Main", "OBJECT2_READY");
     }
 
     private async void OnMessageReceived(string message)
@@ -44,7 +36,8 @@ public partial class MainWindow : Window
         {
             if (message == "START")
             {
-                await GenerateData();
+                // START without parameters — do nothing. Generation requires PARAMS from Lab6.
+                StatusTextBlock.Text = "Отримано START без параметрів — очікування PARAMS";
             }
             else if (message.StartsWith("PARAMS:", StringComparison.OrdinalIgnoreCase))
             {
@@ -65,7 +58,9 @@ public partial class MainWindow : Window
 
     private async void Generate_Click(object? sender, RoutedEventArgs e)
     {
-        await GenerateData();
+        // Manual generation removed — Object2 is passive and waits for PARAMS from Lab6.
+        // This handler was removed from the UI; method retained as no-op for compatibility.
+        await Task.CompletedTask;
     }
 
     private async Task GenerateData()
@@ -77,7 +72,9 @@ public partial class MainWindow : Window
             
             if (!File.Exists(paramFile))
             {
-                StatusTextBlock.Text = "Помилка: файл параметрів не знайдено";
+                // У типовому потоці керування параметри надходять через Lab6 (PARAMS)
+                // Не вважаємо це помилкою: просто повідомляємо про очікування
+                StatusTextBlock.Text = "Очікування параметрів від менеджера (Lab6)";
                 return;
             }
 

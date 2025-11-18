@@ -14,6 +14,7 @@ public partial class MainWindow : Window
     private Process? _object2Process;
     private Process? _object3Process;
     private string _logText = "";
+    private ParametersDialog.Parameters? _lastParameters;
 
     public MainWindow()
     {
@@ -38,6 +39,11 @@ public partial class MainWindow : Window
             if (message == "OBJECT2_READY")
             {
                 StatusTextBlock.Text = "Object2 готовий до роботи";
+                // Коли Object2 готовий — надсилаємо останні параметри, якщо вони є
+                if (_lastParameters is not null)
+                {
+                    _ = SendParamsToObject2Async(_lastParameters);
+                }
             }
             else if (message == "OBJECT2_COMPLETED")
             {
@@ -73,20 +79,10 @@ public partial class MainWindow : Window
         await SaveParametersToFile(result);
 
         // Запускаємо/забезпечуємо Object2
+        _lastParameters = result;
         await StartObject2();
-
-        // Надсилаємо параметри через Named Pipe (кросплатформенно)
-        var msg = $"PARAMS:{result.NPoints};{result.XMin};{result.XMax};{result.YMin};{result.YMax}";
-        var sent = await MessageClient.SendMessageAsync("Object2_Pipe", msg);
-        if (!sent)
-        {
-            AddLog("Не вдалося надіслати параметри до Object2 через pipe. Перевірте, що Object2 запущений.");
-            StatusTextBlock.Text = "Помилка IPC із Object2";
-            return;
-        }
-
-        // Додатково можемо ініціювати старт
-        await MessageClient.SendMessageAsync("Object2_Pipe", "START");
+        // Спроба надіслати параметри одразу; якщо сервер ще не готовий — OBJECT2_READY перешле їх пізніше
+        _ = SendParamsToObject2Async(result);
     }
 
     private async Task SaveParametersToFile(ParametersDialog.Parameters parameters)
@@ -101,7 +97,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            string exePath = ResolveExecutablePath("Object2");
+            var (fileName, args, workingDir, exists) = ResolveExecutableOrDll("Object2");
             
             // Перевіряємо чи Object2 вже запущений
             if (_object2Process != null && !_object2Process.HasExited)
@@ -111,9 +107,9 @@ public partial class MainWindow : Window
                 return;
             }
 
-            if (!File.Exists(exePath))
+            if (!exists)
             {
-                AddLog($"ПОМИЛКА: Не знайдено файл {exePath}");
+                AddLog($"ПОМИЛКА: Не знайдено виконуваний файл або DLL Object2");
                 StatusTextBlock.Text = "Помилка: Object2.exe не знайдено";
                 return;
             }
@@ -122,9 +118,10 @@ public partial class MainWindow : Window
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = exePath,
-                    UseShellExecute = true,
-                    WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory
+                    FileName = fileName,
+                    Arguments = args ?? string.Empty,
+                    UseShellExecute = string.IsNullOrEmpty(args),
+                    WorkingDirectory = workingDir
                 }
             };
 
@@ -145,7 +142,7 @@ public partial class MainWindow : Window
         {
             await Task.Delay(1000); // Невелика затримка для завершення запису в clipboard
             
-            string exePath = ResolveExecutablePath("Object3");
+            var (fileName, args, workingDir, exists) = ResolveExecutableOrDll("Object3");
             
             // Перевіряємо чи Object3 вже запущений
             if (_object3Process != null && !_object3Process.HasExited)
@@ -155,9 +152,9 @@ public partial class MainWindow : Window
                 return;
             }
 
-            if (!File.Exists(exePath))
+            if (!exists)
             {
-                AddLog($"ПОМИЛКА: Не знайдено файл {exePath}");
+                AddLog($"ПОМИЛКА: Не знайдено виконуваний файл або DLL Object3");
                 StatusTextBlock.Text = "Помилка: Object3.exe не знайдено";
                 return;
             }
@@ -166,9 +163,10 @@ public partial class MainWindow : Window
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = exePath,
-                    UseShellExecute = true,
-                    WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory
+                    FileName = fileName,
+                    Arguments = args ?? string.Empty,
+                    UseShellExecute = string.IsNullOrEmpty(args),
+                    WorkingDirectory = workingDir
                 }
             };
 
@@ -183,17 +181,75 @@ public partial class MainWindow : Window
         }
     }
 
-    private static string ResolveExecutablePath(string baseName)
+    private static (string fileName, string? args, string workingDir, bool exists) ResolveExecutableOrDll(string baseName)
     {
-        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        // Перевіряємо .exe (Windows)
-        var exe = Path.Combine(baseDir, baseName + ".exe");
-        if (File.Exists(exe)) return exe;
-        // Перевіряємо без розширення (Unix/macOS)
-        var noExt = Path.Combine(baseDir, baseName);
-        if (File.Exists(noExt)) return noExt;
-        // Повертаємо шлях з .exe за замовчуванням для повідомлення про помилку
-        return exe;
+        var baseDir = AppDomain.CurrentDomain.BaseDirectory; // .../Lab6/Lab6/bin/<Config>/net9.0/
+
+        string CandidateHost(string dir) =>
+            File.Exists(Path.Combine(dir, baseName + ".exe"))
+                ? Path.Combine(dir, baseName + ".exe")
+                : Path.Combine(dir, baseName);
+
+        // 1) Same directory as Lab6 (publish scenario)
+        var host = CandidateHost(baseDir);
+        if (File.Exists(host)) return (host, null, baseDir, true);
+
+        var dll = Path.Combine(baseDir, baseName + ".dll");
+        if (File.Exists(dll)) return ("dotnet", dll, baseDir, true);
+
+        // 2) Try sibling project bin path: ../../.. to reach Lab6 project dir
+        // baseDir => net9.0 -> Debug/Release -> bin -> Lab6 project dir
+        var netDir = new DirectoryInfo(baseDir);
+        var configDir = netDir.Parent;            // Debug/Release
+        var binDir = configDir?.Parent;           // bin
+        var projDir = binDir?.Parent;             // .../Lab6/Lab6
+        var solutionLab6Dir = projDir?.Parent;    // .../Lab6
+        if (solutionLab6Dir != null && configDir != null)
+        {
+            string cfg = configDir.Name;
+            string framework = netDir.Name; // net9.0
+
+            string TryPath(string projectName)
+                => Path.Combine(solutionLab6Dir.FullName, projectName, "bin", cfg, framework);
+
+            string candidateDir = TryPath(baseName);
+            var host2 = CandidateHost(candidateDir);
+            if (File.Exists(host2)) return (host2, null, candidateDir, true);
+            var dll2 = Path.Combine(candidateDir, baseName + ".dll");
+            if (File.Exists(dll2)) return ("dotnet", dll2, candidateDir, true);
+
+            // As a last resort in dev, run the project directly via `dotnet run`
+            var csproj = Path.Combine(solutionLab6Dir.FullName, baseName, baseName + ".csproj");
+            if (File.Exists(csproj))
+            {
+                // dotnet run --project <csproj> -c <cfg>
+                var argsRun = $"run --project \"{csproj}\" -c {cfg}";
+                return ("dotnet", argsRun, solutionLab6Dir.FullName, true);
+            }
+        }
+
+        // 3) Try a published out folder one level up (Lab6/out)
+        var outDir = Path.Combine(solutionLab6Dir?.FullName ?? baseDir, "out");
+        var host3 = CandidateHost(outDir);
+        if (File.Exists(host3)) return (host3, null, outDir, true);
+        var dll3 = Path.Combine(outDir, baseName + ".dll");
+        if (File.Exists(dll3)) return ("dotnet", dll3, outDir, true);
+
+        // Not found
+        return (Path.Combine(baseDir, baseName + ".exe"), null, baseDir, false);
+    }
+
+    private static async Task<bool> SendParamsToObject2Async(ParametersDialog.Parameters p)
+    {
+        // до 5 спроб із невеликою затримкою
+        var payload = $"PARAMS:{p.NPoints};{p.XMin};{p.XMax};{p.YMin};{p.YMax}";
+        for (int i = 0; i < 5; i++)
+        {
+            if (await MessageClient.SendMessageAsync("Object2_Pipe", payload))
+                return true;
+            await Task.Delay(400);
+        }
+        return false;
     }
 
     private void AddLog(string message)

@@ -1,36 +1,38 @@
 <Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="Lab6.ParametersDialog"
-        Title="Введення параметрів" 
-        Width="400" Height="350"
-        WindowStartupLocation="CenterOwner"
-        CanResize="False">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls"
+    x:Class="Lab6.ParametersDialog"
+    Title="Введення параметрів" 
+    Width="400" Height="500"
+    WindowStartupLocation="CenterOwner"
+    CanResize="False"
+    RequestedThemeVariant="Light">
     <StackPanel Margin="20" Spacing="15">
         <TextBlock Text="Параметри генерації даних" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/>
         
         <StackPanel Spacing="5">
             <TextBlock Text="Кількість точок (nPoints):"/>
-            <NumericUpDown x:Name="NPointsInput" Minimum="5" Maximum="100" Value="10" FormatString="0"/>
+            <controls:NumericUpDown x:Name="NPointsInput" Minimum="5" Maximum="100" Value="10" Increment="1" FormatString="0"/>
         </StackPanel>
         
         <StackPanel Spacing="5">
             <TextBlock Text="Мінімум X (xMin):"/>
-            <NumericUpDown x:Name="XMinInput" Minimum="-1000" Maximum="1000" Value="0" FormatString="0"/>
+            <controls:NumericUpDown x:Name="XMinInput" Minimum="-1000" Maximum="1000" Value="0" Increment="1" FormatString="0"/>
         </StackPanel>
         
         <StackPanel Spacing="5">
             <TextBlock Text="Максимум X (xMax):"/>
-            <NumericUpDown x:Name="XMaxInput" Minimum="-1000" Maximum="1000" Value="100" FormatString="0"/>
+            <controls:NumericUpDown x:Name="XMaxInput" Minimum="-1000" Maximum="1000" Value="100" Increment="1" FormatString="0"/>
         </StackPanel>
         
         <StackPanel Spacing="5">
             <TextBlock Text="Мінімум Y (yMin):"/>
-            <NumericUpDown x:Name="YMinInput" Minimum="-1000" Maximum="1000" Value="0" FormatString="0"/>
+            <controls:NumericUpDown x:Name="YMinInput" Minimum="-1000" Maximum="1000" Value="0" Increment="1" FormatString="0"/>
         </StackPanel>
         
         <StackPanel Spacing="5">
             <TextBlock Text="Максимум Y (yMax):"/>
-            <NumericUpDown x:Name="YMaxInput" Minimum="-1000" Maximum="1000" Value="100" FormatString="0"/>
+            <controls:NumericUpDown x:Name="YMaxInput" Minimum="-1000" Maximum="1000" Value="100" Increment="1" FormatString="0"/>
         </StackPanel>
         
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="0,20,0,0">
