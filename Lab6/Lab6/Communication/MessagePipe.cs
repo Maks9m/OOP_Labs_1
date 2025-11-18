@@ -71,7 +71,7 @@ public class MessageServer : IDisposable
             }
             catch
             {
-                // Connection closed or error
+                // Ignore connection errors
             }
         }
     }

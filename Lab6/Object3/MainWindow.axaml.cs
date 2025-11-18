@@ -17,7 +17,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         InitializeMessageServer();
         
-        // Автоматично завантажуємо дані при запуску
+        // Try to load data from clipboard shortly after startup
         _ = Task.Run(async () =>
         {
             await Task.Delay(500);

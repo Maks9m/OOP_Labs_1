@@ -183,31 +183,30 @@ public partial class MainWindow : Window
 
     private static (string fileName, string? args, string workingDir, bool exists) ResolveExecutableOrDll(string baseName)
     {
-        var baseDir = AppDomain.CurrentDomain.BaseDirectory; // .../Lab6/Lab6/bin/<Config>/net9.0/
+        // Locate executable/DLL or fall back to `dotnet run` for development layouts.
+        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
         string CandidateHost(string dir) =>
             File.Exists(Path.Combine(dir, baseName + ".exe"))
                 ? Path.Combine(dir, baseName + ".exe")
                 : Path.Combine(dir, baseName);
 
-        // 1) Same directory as Lab6 (publish scenario)
         var host = CandidateHost(baseDir);
         if (File.Exists(host)) return (host, null, baseDir, true);
 
         var dll = Path.Combine(baseDir, baseName + ".dll");
         if (File.Exists(dll)) return ("dotnet", dll, baseDir, true);
 
-        // 2) Try sibling project bin path: ../../.. to reach Lab6 project dir
-        // baseDir => net9.0 -> Debug/Release -> bin -> Lab6 project dir
+        // Try sibling project bin path (development layout)
         var netDir = new DirectoryInfo(baseDir);
-        var configDir = netDir.Parent;            // Debug/Release
-        var binDir = configDir?.Parent;           // bin
-        var projDir = binDir?.Parent;             // .../Lab6/Lab6
-        var solutionLab6Dir = projDir?.Parent;    // .../Lab6
+        var configDir = netDir.Parent;
+        var binDir = configDir?.Parent;
+        var projDir = binDir?.Parent;
+        var solutionLab6Dir = projDir?.Parent;
         if (solutionLab6Dir != null && configDir != null)
         {
             string cfg = configDir.Name;
-            string framework = netDir.Name; // net9.0
+            string framework = netDir.Name;
 
             string TryPath(string projectName)
                 => Path.Combine(solutionLab6Dir.FullName, projectName, "bin", cfg, framework);
@@ -218,17 +217,14 @@ public partial class MainWindow : Window
             var dll2 = Path.Combine(candidateDir, baseName + ".dll");
             if (File.Exists(dll2)) return ("dotnet", dll2, candidateDir, true);
 
-            // As a last resort in dev, run the project directly via `dotnet run`
             var csproj = Path.Combine(solutionLab6Dir.FullName, baseName, baseName + ".csproj");
             if (File.Exists(csproj))
             {
-                // dotnet run --project <csproj> -c <cfg>
                 var argsRun = $"run --project \"{csproj}\" -c {cfg}";
                 return ("dotnet", argsRun, solutionLab6Dir.FullName, true);
             }
         }
-
-        // 3) Try a published out folder one level up (Lab6/out)
+        // Try a published out folder one level up (Lab6/out)
         var outDir = Path.Combine(solutionLab6Dir?.FullName ?? baseDir, "out");
         var host3 = CandidateHost(outDir);
         if (File.Exists(host3)) return (host3, null, outDir, true);

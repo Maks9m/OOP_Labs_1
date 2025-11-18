@@ -56,12 +56,7 @@ public partial class MainWindow : Window
         });
     }
 
-    private async void Generate_Click(object? sender, RoutedEventArgs e)
-    {
-        // Manual generation removed — Object2 is passive and waits for PARAMS from Lab6.
-        // This handler was removed from the UI; method retained as no-op for compatibility.
-        await Task.CompletedTask;
-    }
+    // Manual generation via UI removed; Object2 is passive and waits for PARAMS from Lab6.
 
     private async Task GenerateData()
     {
